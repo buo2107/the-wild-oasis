@@ -9,10 +9,24 @@ import Settings from "./pages/Settings";
 import PageNotFound from "./pages/PageNotFound";
 import GlobalStyles from "./styles/GlobalStyles";
 import AppLayout from "./ui/AppLayout";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+// 1. Creating "QueryClient" that sets up the cash behind the scenes.
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      // staleTime: 60 * 1000,
+      staleTime: 0,
+    },
+  },
+});
 
 function App() {
   return (
-    <>
+    // 2. Providing the "QueryClient" to the app
+    <QueryClientProvider client={queryClient}>
+      <ReactQueryDevtools initialIsOpen={false} />
       <GlobalStyles />
       <BrowserRouter>
         <Routes>
@@ -29,7 +43,7 @@ function App() {
           <Route path="*" element={<PageNotFound />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </QueryClientProvider>
   );
 }
 
