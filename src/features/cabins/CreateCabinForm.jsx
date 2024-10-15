@@ -14,7 +14,7 @@ function CreateCabinForm() {
   // 1.Create the React-Hook-Form(RHF) register
   const { register, handleSubmit, reset, getValues, formState } = useForm();
   const { errors } = formState;
-  console.log(errors);
+  // console.log(errors);
 
   const queryClient = useQueryClient();
 
@@ -36,7 +36,7 @@ function CreateCabinForm() {
     // So, with RHF, we can get the data form without creating any state variables!
     // console.log(data);
 
-    mutate(data);
+    mutate({ ...data, image: data.image[0] }); // With image data, we only need its File message.
   }
 
   // While error happen, form submit will call onError() with the error messages, instead of onSubmit() with user data
@@ -52,6 +52,7 @@ function CreateCabinForm() {
         <Input
           type="text"
           id="name"
+          disabled={isCreating}
           {...register("name", { required: "This field is required" })}
         />
       </FormRow>
@@ -60,6 +61,7 @@ function CreateCabinForm() {
         <Input
           type="number"
           id="maxCapacity"
+          disabled={isCreating}
           {...register("maxCapacity", {
             required: "This field is required",
             min: {
@@ -74,6 +76,7 @@ function CreateCabinForm() {
         <Input
           type="number"
           id="regularPrice"
+          disabled={isCreating}
           {...register("regularPrice", { required: "This field is required" })}
         />
       </FormRow>
@@ -83,6 +86,7 @@ function CreateCabinForm() {
           type="number"
           id="discount"
           defaultValue={0}
+          disabled={isCreating}
           {...register("discount", {
             required: "This field is required",
             validate: (value) =>
@@ -100,12 +104,17 @@ function CreateCabinForm() {
           type="number"
           id="description"
           defaultValue=""
+          disabled={isCreating}
           {...register("description", { required: "This field is required" })}
         />
       </FormRow>
 
       <FormRow label="Cabin photo" error={errors?.image?.message}>
-        <FileInput id="image" accept="image/*" />
+        <FileInput
+          id="image"
+          accept="image/*"
+          {...register("image", { required: "This field is required" })}
+        />
       </FormRow>
 
       <FormRow>
