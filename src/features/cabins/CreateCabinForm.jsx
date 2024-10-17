@@ -1,6 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 
 import Input from "../../ui/Input";
 import Form from "../../ui/Form";
@@ -9,10 +7,15 @@ import FileInput from "../../ui/FileInput";
 import Textarea from "../../ui/Textarea";
 import FormRow from "../../ui/FormRow";
 
-import { createEditCabin } from "../../services/apiCabins";
+import { useCreateCabin } from "./useCreateCabin";
+import { useEditCabin } from "./useEditCabin";
 
 /* CreateCabinForm need to deal with 2 situation: one for creating new cabin, the other one for editing existed cabin */
 function CreateCabinForm({ cabinToEdit = {} }) {
+  const { isCreating, createCabin } = useCreateCabin();
+  const { isEditing, editCabin } = useEditCabin();
+  const isWorking = isCreating || isEditing;
+
   // Confirm whether is in EDIT situation
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
@@ -23,34 +26,6 @@ function CreateCabinForm({ cabinToEdit = {} }) {
 
   const { errors } = formState;
 
-  const queryClient = useQueryClient();
-
-  const { mutate: createCabin, isLoading: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success("New cabin successfully created");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
-
-  const { mutate: editCabin, isLoading: isEditing } = useMutation({
-    mutationFn: ({ newCabinData, id }) => createEditCabin(newCabinData, id),
-    onSuccess: () => {
-      toast.success("New cabin successfully edited");
-      queryClient.invalidateQueries({
-        queryKey: ["cabins"],
-      });
-      reset();
-    },
-    onError: (err) => toast.error(err.message),
-  });
-
-  const isWorking = isCreating || isEditing;
-
   function onSubmit(data) {
     // console.log(data);
 
@@ -58,8 +33,20 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     const image = typeof data.image === "string" ? data.image : data.image[0];
 
     if (isEditSession)
-      editCabin({ newCabinData: { ...data, image }, id: editId });
-    else createCabin({ ...data, image });
+      editCabin(
+        { newCabinData: { ...data, image }, id: editId },
+        {
+          onSuccess: () => reset(),
+        }
+      );
+    // we can not only use the onSuccess handler in useMutation, but also in where the mutation function happen.
+    else
+      createCabin(
+        { ...data, image },
+        {
+          onSuccess: () => reset(),
+        }
+      );
   }
 
   function onError(errors) {
