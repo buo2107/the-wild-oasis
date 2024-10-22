@@ -1,4 +1,10 @@
-import { cloneElement, createContext, useContext, useState } from "react";
+import {
+  cloneElement,
+  createContext,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { HiXMark } from "react-icons/hi2";
 import styled from "styled-components";
@@ -75,10 +81,18 @@ function Open({ children, opens: opensWindowName }) {
 
 function Window({ children, name }) {
   const { openName, close } = useContext(ModalContext);
+  // 使用 ref 操作 DOM
+  const ref = useRef();
+
   if (name !== openName) return null;
 
+  function handleClickOutside(e) {
+    // if the click target is Overlay, then call close()
+    e.target === ref.current && close();
+  }
+
   return createPortal(
-    <Overlay>
+    <Overlay ref={ref} onClick={handleClickOutside}>
       <StyledModal>
         <Button onClick={close}>
           <HiXMark />
