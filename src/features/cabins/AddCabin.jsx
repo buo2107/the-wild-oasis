@@ -7,7 +7,7 @@ import Modal from "../../ui/Modal";
 // 因為 'isOpenModal' state 由 Modal 來管理比較合理，也更利於component reusability
 function AddCabin() {
   return (
-    <>
+    <div>
       <Modal>
         <Modal.Open opens="cabin-form">
           <Button>Add new cabin</Button>
@@ -16,16 +16,7 @@ function AddCabin() {
           <CreateCabinForm />
         </Modal.Window>
       </Modal>
-
-      <Modal>
-        <Modal.Open opens="table">
-          <Button>See cabin table</Button>
-        </Modal.Open>
-        <Modal.Window name="table">
-          <CabinTable />
-        </Modal.Window>
-      </Modal>
-    </>
+    </div>
   );
 }
 
