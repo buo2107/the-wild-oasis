@@ -12,7 +12,7 @@ export function useLogin() {
     onSuccess: (user) => {
       // Manually set the current user data into React Query cache, then the useUser hook can just get the data from cache
       queryClient.setQueriesData(["user", user]);
-      navigate("/dashboard");
+      navigate("/dashboard", { replace: true });
     },
     onError: (err) => {
       console.error("ERROR", err);
